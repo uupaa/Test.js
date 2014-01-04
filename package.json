@@ -1,0 +1,21 @@
+{
+  "name":           "uupaa.test.js",
+  "version":        "0.8.0",
+  "description":    "Test runner.",
+  "url":            "https://github.com/uupaa/Test.js",
+  "keywords":       ["test", "util", "uupaa"],
+  "author":         "uupaa <uupaa.js@gmail.com>",
+  "license":        "MIT",
+  "repository":     { "type": "git", "url": "https://github.com/uupaa/Test.js.git" },
+  "contributors":   [],
+  "devDependencies": {
+    "uupaa.help.js": ">= 0.8.1",
+    "uupaa.task.js": ">= 0.8.0"
+  },
+  "lib":            "./lib/",
+  "main":           "index.js",
+  "scripts": {
+    "start":        "npm install",
+    "test":         "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js; open test/index.html"
+  }
+}
