@@ -1,7 +1,7 @@
 new Test().add([
         testOK,
 //      testNG,
-    ]).run();
+    ]).run().worker();
 
 function testOK(next) {
 
