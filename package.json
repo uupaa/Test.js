@@ -16,6 +16,7 @@
     "uupaa.task.js":    ""
   },
   "devDependencies": {
+    "uupaa.mappedarray.js": "",
     "uupaa.help.js":    "",
     "uupaa.task.js":    "",
     "uupaa.minify.js":  ""
