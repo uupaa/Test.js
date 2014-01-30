@@ -1,6 +1,6 @@
 {
   "name":           "uupaa.test.js",
-  "version":        "0.8.5",
+  "version":        "0.8.6",
   "description":    "Test runner.",
   "url":            "https://github.com/uupaa/Test.js",
   "keywords":       ["test", "util", "uupaa"],
@@ -11,6 +11,9 @@
   "scripts": {
     "start":        "node node_modules/uupaa.minify.js --keep --output ./lib/Test.min.js ./lib/Test.js",
     "test":         "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js; open test/index.html"
+  },
+  "dependencies": {
+    "uupaa.task.js":    ""
   },
   "devDependencies": {
     "uupaa.help.js":    "",
