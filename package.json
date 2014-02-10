@@ -1,6 +1,6 @@
 {
   "name":           "uupaa.test.js",
-  "version":        "0.8.8",
+  "version":        "0.8.9",
   "description":    "Test runner.",
   "url":            "https://github.com/uupaa/Test.js",
   "keywords":       ["test", "util", "uupaa"],
@@ -16,7 +16,6 @@
     "uupaa.task.js":    ""
   },
   "devDependencies": {
-    "uupaa.mappedarray.js": "",
     "uupaa.help.js":    "",
     "uupaa.task.js":    "",
     "uupaa.minify.js":  ""
