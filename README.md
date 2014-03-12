@@ -1,34 +1,77 @@
 Test.js
 =========
 
-Test.js is test runner.
+Test Runner.
 
-# API Document
+# Document
 
 https://github.com/uupaa/Test.js/wiki/Test
 
-# Install, Setup modules
+# How to use
 
-```sh
-$ brew install closure-compiler
+```js
+<script src="lib/Test.js">
+<script>
+// for Browser
 
-$ git clone git@github.com:uupaa/Test.js.git
-$ cd Test.js
-$ npm install
+    new Test().add([
+        testCase1,
+        testCase2,
+    ]).run().worker(function(err, test) {
+        if (!err && typeof Module_ !== "undefined") {
+            var moduleName = Test.swap(Module, Module_);
+
+            new Test(test).run(function(err, test) {
+                Test.undo(moduleName);
+            });
+        }
+    });
+
+</script>
 ```
 
-# Minify
+```js
+// for WebWorkers
+importScripts("lib/Test.js");
 
-```sh
-$ npm start
-
-  or
-
-$ node node_modules/uupaa.minify.js --keep --output ./lib/Test.min.js ./lib/Test.js
+    ...
 ```
 
-# Test
+```js
+// for Node.js
+var Test = require("lib/Test.js");
 
-```sh
-$ npm test
+    ...
 ```
+
+# for Developers
+
+1. Install development dependency tools
+
+    ```sh
+    $ brew install closure-compiler
+    $ brew install node
+    $ npm install -g plato
+    ```
+
+2. Clone Repository and Install
+
+    ```sh
+    $ git clone git@github.com:uupaa/Test.js.git
+    $ cd Test.js
+    $ npm install
+    ```
+
+3. Build and Minify
+
+    `$ npm run build`
+
+4. Test
+
+    `$ npm run test`
+
+5. Lint
+
+    `$ npm run lint`
+
+

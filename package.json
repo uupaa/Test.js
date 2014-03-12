@@ -1,6 +1,6 @@
 {
   "name":           "uupaa.test.js",
-  "version":        "0.8.9",
+  "version":        "0.8.10",
   "description":    "Test runner.",
   "url":            "https://github.com/uupaa/Test.js",
   "keywords":       ["test", "util", "uupaa"],
@@ -9,13 +9,23 @@
     "url":          "https://github.com/uupaa/Test.js.git"
   },
   "scripts": {
-    "start":        "node node_modules/uupaa.minify.js --keep --output ./lib/Test.min.js ./lib/Test.js",
-    "test":         "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js; open test/index.html"
+    "watch":        "node node_modules/uupaa.watch.js --verbose --action build ./lib/Test.js",
+    "build":        "node node_modules/uupaa.minify.js --keep --option 'formatting pretty_print' --output ./lib/Test.min.js ./lib/Test.js",
+    "build-release":"node node_modules/uupaa.minify.js --module all --output ./lib/Test.min.js",
+    "test":         "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js; open test/index.html",
+    "lint":         "plato --title Test.js --jshint .jshintrc -d lint/plato lib/Test.js; open lint/plato/index.html"
+  },
+  "build": {
+    "all": { "lib/Test.js": "" },
+    "node": { },
+    "worker": { },
+    "browser": { }
   },
   "dependencies": {
     "uupaa.task.js":    ""
   },
   "devDependencies": {
+    "uupaa.valid.js":   "",
     "uupaa.help.js":    "",
     "uupaa.task.js":    "",
     "uupaa.minify.js":  ""
