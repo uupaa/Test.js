@@ -1,12 +1,16 @@
 new Test().add([
         testOK,
 //      testNG,
-    ]).run().worker(function(err, test) {
-        if (!err && typeof Test_ !== "undefined") {
-//          var moduleName = Test.swap(Test, Test_);
+    ]).run(function(err, test) {
+        if (1) {
+            err || test.worker(function(err, test) {
+                if (!err && typeof Test_ !== "undefined") {
+//                  var name = Test.swap(Test, Test_);
 
-            new Test(test).run().worker(function(err, test) {
-//              Test.undo(moduleName);
+                    new Test(test).run().worker(function(err, test) {
+//                      Test.undo(name);
+                    });
+                }
             });
         }
     });

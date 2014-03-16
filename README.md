@@ -17,12 +17,16 @@ https://github.com/uupaa/Test.js/wiki/Test
     new Test().add([
         testCase1,
         testCase2,
-    ]).run().worker(function(err, test) {
-        if (!err && typeof Module_ !== "undefined") {
-            var moduleName = Test.swap(Module, Module_);
+    ]).run(function(err, test) {
+        if (1) {
+            err || test.worker(function(err, test) {
+                if (!err && typeof Module_ !== "undefined") {
+                    var name = Test.swap(Module, Module_);
 
-            new Test(test).run(function(err, test) {
-                Test.undo(moduleName);
+                    new Test(test).run(function(err, test) {
+                        Test.undo(name);
+                    });
+                }
             });
         }
     });
