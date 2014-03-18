@@ -1,7 +1,7 @@
 {
   "name":           "uupaa.test.js",
-  "version":        "0.8.11",
-  "description":    "Test runner.",
+  "version":        "0.8.12",
+  "description":    "Test Runner.",
   "url":            "https://github.com/uupaa/Test.js",
   "keywords":       ["test", "util", "uupaa"],
   "repository": {
@@ -9,18 +9,16 @@
     "url":          "https://github.com/uupaa/Test.js.git"
   },
   "scripts": {
-    "watch":        "node node_modules/uupaa.watch.js --verbose --action build ./lib/Test.js",
-    "build":        "node node_modules/uupaa.minify.js --output ./lib/Test.min.js --verbose --keep --pretty",
-    "build-simple": "node node_modules/uupaa.minify.js --output ./lib/Test.min.js --verbose --keep --pretty --nowrap --simple",
-    "build-release":"node node_modules/uupaa.minify.js --output ./lib/Test.min.js --verbose --build all",
+    "watch":        "node node_modules/uupaa.watch.js --verbose --action build",
+    "build":        "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty",
+    "build-simple": "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty --nowrap --simple",
+    "build-release":"node node_modules/uupaa.minify.js --verbose --strict --module",
     "test":         "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js; open test/index.html",
-    "lint":         "node lint/plato.js; open lint/plato/index.html"
+    "lint":         "node node_modules/uupaa.plato.js; open lint/plato/index.html"
   },
-  "build": {
-    "all": { "lib/Test.js": "" },
-    "node": { },
-    "worker": { },
-    "browser": { }
+  "x-build": {
+    "inputs":       ["lib/Test.js"],
+    "output":       "lib/Test.min.js"
   },
   "dependencies": {
     "uupaa.task.js":    ""
@@ -28,7 +26,9 @@
   "devDependencies": {
     "uupaa.valid.js":   "",
     "uupaa.help.js":    "",
-    "uupaa.task.js":    "",
+    "uupaa.test.js":    "",
+    "uupaa.watch.js":   "",
+    "uupaa.plato.js":   "",
     "uupaa.minify.js":  ""
   },
   "lib":            "./lib/",
