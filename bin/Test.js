@@ -43,7 +43,6 @@ var options = _parseCommandLineOptions({
         verbose:    false,      // Boolean: true is verbose mode.
         browser:    false,      // Boolean: true is update test/index.html file.
         node:       false,      // Boolean: true is update test/index.node.js file.
-        target:     "solo",     // String: "solo" or "release"
     });
 
 var json = null;
@@ -77,39 +76,14 @@ function updateBrowserTestFile(options, // @arg Object:
     // --- worker ---
     var json = JSON.parse(JSON.stringify(json_));
 
-    json.devDependenciesFiles = json.devDependenciesModules.reduce(function(result, moduleName) { // "uupaa.console.js"
-                                        if (moduleName in json.moduleTargets) {
-                                            var selector = json.moduleTargets[moduleName].join(" ");
-
-                                            if ( /worker/i.test(selector) ) { // worker ready module
-                                                for (var i = 0, iz = json.devDependenciesFiles.length; i < iz; ++i) {
-                                                    if ( json.devDependenciesFiles[i].indexOf(moduleName) >= 0) {
-                                                        // moduleName matched devDependenciesFile
-                                                        result.push( json.devDependenciesFiles[i] );
-                                                        return result;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        return result;
-                                    }, []);
-
-    json.dependenciesFiles = json.dependenciesModules.reduce(function(result, moduleName) { // "uupaa.console.js"
-                                        if (moduleName in json.moduleTargets) {
-                                            var selector = json.moduleTargets[moduleName].join(" ");
-
-                                            if ( /worker/i.test(selector) ) { // worker ready module
-                                                for (var i = 0, iz = json.dependenciesFiles.length; i < iz; ++i) {
-                                                    if ( json.dependenciesFiles[i].indexOf(moduleName) >= 0) {
-                                                        // moduleName matched dependenciesFiles
-                                                        result.push( json.dependenciesFiles[i] );
-                                                        return result;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        return result;
-                                    }, []);
+    json.devDependenciesFiles = _filter(json.devDependenciesModules,
+                                        json.devDependenciesFiles,
+                                        json.moduleTargets,
+                                        "worker");
+    json.dependenciesFiles = _filter(json.dependenciesModules,
+                                     json.dependenciesFiles,
+                                     json.moduleTargets,
+                                     "worker");
 
     if ( /worker/i.test( json.build.target.join(" ") ) ) { // worker ready module
         json.build.files = [];
@@ -126,39 +100,10 @@ function updateBrowserTestFile(options, // @arg Object:
     // --- browser ---
     var json = JSON.parse(JSON.stringify(json_));
 
-    json.devDependenciesFiles = json.devDependenciesModules.reduce(function(result, moduleName) { // "uupaa.console.js"
-                                        if (moduleName in json.moduleTargets) {
-                                            var selector = json.moduleTargets[moduleName].join(" ");
-
-                                            if ( /browser/i.test(selector) ) { // browser ready module
-                                                for (var i = 0, iz = json.devDependenciesFiles.length; i < iz; ++i) {
-                                                    if ( json.devDependenciesFiles[i].indexOf(moduleName) >= 0) {
-                                                        // moduleName matched devDependenciesFile
-                                                        result.push( json.devDependenciesFiles[i] );
-                                                        return result;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        return result;
-                                    }, []);
-
-    json.dependenciesFiles = json.dependenciesModules.reduce(function(result, moduleName) { // "uupaa.console.js"
-                                        if (moduleName in json.moduleTargets) {
-                                            var selector = json.moduleTargets[moduleName].join(" ");
-
-                                            if ( /browser/i.test(selector) ) { // browser ready module
-                                                for (var i = 0, iz = json.dependenciesFiles.length; i < iz; ++i) {
-                                                    if ( json.dependenciesFiles[i].indexOf(moduleName) >= 0) {
-                                                        // moduleName matched dependenciesFiles
-                                                        result.push( json.dependenciesFiles[i] );
-                                                        return result;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        return result;
-                                    }, []);
+    json.devDependenciesFiles = _filter(json.devDependenciesModules, json.devDependenciesFiles,
+                                        json.moduleTargets, "browser");
+    json.dependenciesFiles    = _filter(json.dependenciesModules, json.dependenciesFiles,
+                                        json.moduleTargets, "browser");
 
     if ( /browser/i.test( json.build.target.join(" ") ) ) { // browser ready module
         json.build.files = [];
@@ -190,39 +135,10 @@ function updateNodeTestFile(options, // @arg Object:
     // --- node.js ---
     var json = JSON.parse(JSON.stringify(json_));
 
-    json.devDependenciesFiles = json.devDependenciesModules.reduce(function(result, moduleName) { // "uupaa.console.js"
-                                        if (moduleName in json.moduleTargets) {
-                                            var selector = json.moduleTargets[moduleName].join(" ");
-
-                                            if ( /node/i.test(selector) ) { // node ready module
-                                                for (var i = 0, iz = json.devDependenciesFiles.length; i < iz; ++i) {
-                                                    if ( json.devDependenciesFiles[i].indexOf(moduleName) >= 0) {
-                                                        // moduleName matched devDependenciesFile
-                                                        result.push( json.devDependenciesFiles[i] );
-                                                        return result;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        return result;
-                                    }, []);
-
-    json.dependenciesFiles = json.dependenciesModules.reduce(function(result, moduleName) { // "uupaa.console.js"
-                                        if (moduleName in json.moduleTargets) {
-                                            var selector = json.moduleTargets[moduleName].join(" ");
-
-                                            if ( /node/i.test(selector) ) { // node ready module
-                                                for (var i = 0, iz = json.dependenciesFiles.length; i < iz; ++i) {
-                                                    if ( json.dependenciesFiles[i].indexOf(moduleName) >= 0) {
-                                                        // moduleName matched dependenciesFiles
-                                                        result.push( json.dependenciesFiles[i] );
-                                                        return result;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        return result;
-                                    }, []);
+    json.devDependenciesFiles = _filter(json.devDependenciesModules, json.devDependenciesFiles,
+                                        json.moduleTargets, "node");
+    json.dependenciesFiles    = _filter(json.dependenciesModules, json.dependenciesFiles,
+                                        json.moduleTargets, "node");
 
     if ( /node/i.test( json.build.target.join(" ") ) ) { // node ready module
         json.build.files = [];
@@ -243,6 +159,30 @@ function updateNodeTestFile(options, // @arg Object:
     }
 }
 
+function _filter(dependenciesModules, // @arg WebModuleNameStringArray: ["uupaa.console.js", "uupaa.valid.js", ...]
+                 dependenciesFiles,   // @arg WebModuleFilePathStringArray: ["node_modules/uupaa.console.js/lib/Console.js", "node_modules/uupaa.valid.js/lib/Valid.js", ...]
+                 moduleTargets,       // @arg Object: { "uupaa.console.js": ["Worker"], ... }
+                 targetName) {        // @arg String: "browser", "worker", "node"
+
+    var rex = new RegExp(targetName, "i");
+
+    return dependenciesModules.reduce(function(result, moduleName) { // "uupaa.console.js"
+                if (moduleName in moduleTargets) {
+                    var selector = moduleTargets[moduleName].join(" ");
+
+                    if ( rex.test(selector) ) { // module ready?
+                        for (var i = 0, iz = dependenciesFiles.length; i < iz; ++i) {
+                            if ( dependenciesFiles[i].indexOf(moduleName) >= 0) {
+                                result.push( dependenciesFiles[i] );
+                                return result;
+                            }
+                        }
+                    }
+                }
+                return result;
+            }, []);
+}
+
 function _parseCommandLineOptions(options) { // @arg Object:
                                              // @ret Object:
     for (var i = 0, iz = argv.length; i < iz; ++i) {
@@ -253,8 +193,6 @@ function _parseCommandLineOptions(options) { // @arg Object:
         case "--verbose":   options.verbose = true; break;
         case "--browser":   options.browser = true; break;
         case "--node":      options.node    = true; break;
-        case "--solo":      options.target  = "solo"; break;
-        case "--release":   options.target  = "release"; break;
         default:
         }
     }
