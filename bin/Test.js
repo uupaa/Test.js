@@ -85,17 +85,18 @@ function updateBrowserTestFile(options, // @arg Object:
                                      json.moduleTargets,
                                      "worker");
 
-    if ( !/worker/i.test( json.build.target.join(" ") ) ) { // worker ready module
-        json.build.files = [];
+    if ( /worker/i.test( json.build.target.join(" ") ) ) { // worker ready module
+        var importScriptFiles = [].concat( json.devDependenciesFiles.map(_worker),
+                                           json.dependenciesFiles.map(_worker),
+                                           json.build.files.map(_worker) );
+
+        importScriptFiles.push('importScripts(baseDir + "../' + json.build.output + '");');
+        importScriptFiles.push('importScripts(baseDir + "./test.js");');
+        indexHTMLFile = indexHTMLFile.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
+    } else {
+        indexHTMLFile = indexHTMLFile.replace("__IMPORT_SCRIPTS__", "");
     }
 
-    var importScriptFiles = [].concat( json.devDependenciesFiles.map(_worker),
-                                       json.dependenciesFiles.map(_worker),
-                                       json.build.files.map(_worker) );
-
-    importScriptFiles.push('importScripts(baseDir + "../' + json.build.output + '");');
-    importScriptFiles.push('importScripts(baseDir + "./test.js");');
-    indexHTMLFile = indexHTMLFile.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
 
     // --- browser ---
     var json = JSON.parse(JSON.stringify(json_));
@@ -105,20 +106,19 @@ function updateBrowserTestFile(options, // @arg Object:
     json.dependenciesFiles    = _filter(json.dependenciesModules, json.dependenciesFiles,
                                         json.moduleTargets, "browser");
 
-    if ( !/browser/i.test( json.build.target.join(" ") ) ) { // browser ready module
-        json.build.files = [];
+    if ( /browser/i.test( json.build.target.join(" ") ) ) { // browser ready module
+        var scriptFiles = [].concat( json.devDependenciesFiles.map(_browser),
+                                     json.dependenciesFiles.map(_browser),
+                                     json.build.files.map(_browser) );
+
+        scriptFiles.push('<script src="../' + json.build.output + '"></script>');
+        scriptFiles.push('<script src="./test.js"></script>');
+        indexHTMLFile = indexHTMLFile.replace("__SCRIPT__", scriptFiles.join("\n"));
+    } else {
+        indexHTMLFile = indexHTMLFile.replace("__SCRIPT__", "");
     }
 
-    var scriptFiles = [].concat( json.devDependenciesFiles.map(_browser),
-                                 json.dependenciesFiles.map(_browser),
-                                 json.build.files.map(_browser) );
-
-    scriptFiles.push('<script src="../' + json.build.output + '"></script>');
-    scriptFiles.push('<script src="./test.js"></script>');
-    indexHTMLFile = indexHTMLFile.replace("__SCRIPT__", scriptFiles.join("\n"));
-
     fs.writeFileSync("test/index.html", indexHTMLFile + "\n");
-
 
     function _worker(file) {
         return 'importScripts(baseDir + "../' + file + '");';
@@ -140,19 +140,18 @@ function updateNodeTestFile(options, // @arg Object:
     json.dependenciesFiles    = _filter(json.dependenciesModules, json.dependenciesFiles,
                                         json.moduleTargets, "node");
 
-    if ( !/node/i.test( json.build.target.join(" ") ) ) { // node ready module
-        json.build.files = [];
+    if ( /node/i.test( json.build.target.join(" ") ) ) { // node ready module
+        var result = [].concat( json.devDependenciesFiles.map(_node),
+                                json.dependenciesFiles.map(_node),
+                                json.build.files.map(_node) );
+
+        result.push('require("../' + json.build.output + '");');
+        result.push('require("./test.js");');
+
+        fs.writeFileSync("test/index.node.js", result.join("\n"));
+    } else {
+        fs.writeFileSync("test/index.node.js", "");
     }
-
-
-    var result = [].concat( json.devDependenciesFiles.map(_node),
-                            json.dependenciesFiles.map(_node),
-                            json.build.files.map(_node) );
-
-    result.push('require("../' + json.build.output + '");');
-    result.push('require("./test.js");');
-
-    fs.writeFileSync("test/index.node.js", result.join("\n"));
 
     function _node(file) {
         return 'require("../' + file + '");';
