@@ -52,7 +52,9 @@ if (options.help) {
     return;
 }
 
-var moduleData = NodeModule.load();
+var moduleData = NodeModule.load({ dir: "", result: null, develop: true });
+
+moduleData = NodeModule.load({ dir: "", result: moduleData, develop: false });
 
 if (options.browser) {
     updateBrowserTestPage(options, moduleData, package);
