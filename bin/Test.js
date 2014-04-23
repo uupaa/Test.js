@@ -37,6 +37,8 @@ var _CONSOLE_COLOR = {
 
 var fs   = require("fs");
 var argv = process.argv.slice(2);
+var NodeModule = require("uupaa.nodemodule.js");
+var package = JSON.parse(fs.readFileSync("package.json", "UTF-8"));
 
 var options = _parseCommandLineOptions({
         help:       false,      // Boolean: true is show help.
@@ -45,73 +47,40 @@ var options = _parseCommandLineOptions({
         node:       false,      // Boolean: true is update test/index.node.js file.
     });
 
-var json = null;
-var path = "build.json";
-
-
-
-if (fs.existsSync(path)) {
-    json = JSON.parse(fs.readFileSync(path, "UTF-8"));
-} else {
-    console.log(_CONSOLE_COLOR.RED + "Error, build.json file not found. You can try 'npm run build' command." + _CONSOLE_COLOR.CLEAR);
-    return;
-}
 if (options.help) {
     console.log(_CONSOLE_COLOR.YELLOW + _USAGE + _CONSOLE_COLOR.CLEAR);
     return;
 }
 
-//console.log("JSON: = " + JSON.stringify(json, null, 2));
+var moduleData = NodeModule.load();
 
 if (options.browser) {
-    updateBrowserTestFile(options, json);
+    updateBrowserTestPage(options, moduleData, package);
 }
 if (options.node) {
-    updateNodeTestFile(options, json);
+    updateNodeTestPage(options, moduleData, package);
 }
 
 // =========================================================
-function updateBrowserTestFile(options, // @arg Object:
-                               json_) { // @arg Object:
-    // --- worker ---
-    var json = JSON.parse(JSON.stringify(json_));
+function updateBrowserTestPage(options,    // @arg Object:
+                               moduleData, // @arg Object:
+                               package) {  // @arg Object: package.json
 
-    json.devDependenciesFiles = _filter(json.devDependenciesModules,
-                                        json.devDependenciesFiles,
-                                        json.moduleTargets,
-                                        "worker");
-    json.dependenciesFiles = _filter(json.dependenciesModules,
-                                     json.dependenciesFiles,
-                                     json.moduleTargets,
-                                     "worker");
+    var build = package["x-build"] || package["build"];
+    var importScriptFiles = moduleData.workerFiles.concat(build.files).map(_worker);
 
-    if ( /worker/i.test( json.build.target.join(" ") ) ) { // worker ready module
-        var importScriptFiles = [].concat( json.devDependenciesFiles.map(_worker),
-                                           json.dependenciesFiles.map(_worker),
-                                           json.build.files.map(_worker) );
-
-        importScriptFiles.push('importScripts(baseDir + "../' + json.build.output + '");');
+    if ( /worker/i.test( build.target.join(" ") ) ) {
+        importScriptFiles.push('importScripts(baseDir + "../' + build.output + '");');
         importScriptFiles.push('importScripts(baseDir + "./test.js");');
         indexHTMLFile = indexHTMLFile.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
     } else {
         indexHTMLFile = indexHTMLFile.replace("__IMPORT_SCRIPTS__", "");
     }
 
+    var scriptFiles = moduleData.browserFiles.concat(build.files).map(_browser);
 
-    // --- browser ---
-    var json = JSON.parse(JSON.stringify(json_));
-
-    json.devDependenciesFiles = _filter(json.devDependenciesModules, json.devDependenciesFiles,
-                                        json.moduleTargets, "browser");
-    json.dependenciesFiles    = _filter(json.dependenciesModules, json.dependenciesFiles,
-                                        json.moduleTargets, "browser");
-
-    if ( /browser/i.test( json.build.target.join(" ") ) ) { // browser ready module
-        var scriptFiles = [].concat( json.devDependenciesFiles.map(_browser),
-                                     json.dependenciesFiles.map(_browser),
-                                     json.build.files.map(_browser) );
-
-        scriptFiles.push('<script src="../' + json.build.output + '"></script>');
+    if ( /browser/i.test( build.target.join(" ") ) ) { // browser ready module
+        scriptFiles.push('<script src="../' + build.output + '"></script>');
         scriptFiles.push('<script src="./test.js"></script>');
         indexHTMLFile = indexHTMLFile.replace("__SCRIPT__", scriptFiles.join("\n"));
     } else {
@@ -129,23 +98,15 @@ function updateBrowserTestFile(options, // @arg Object:
     }
 }
 
-function updateNodeTestFile(options, // @arg Object:
-                            json_) {  // @arg Object:
+function updateNodeTestPage(options,    // @arg Object:
+                            moduleData, // @arg Object:
+                            package) {  // @arg Object: package.json
 
-    // --- node.js ---
-    var json = JSON.parse(JSON.stringify(json_));
+    var build = package["x-build"] || package["build"];
+    var result = moduleData.nodeFiles.concat(build.files).map(_node);
 
-    json.devDependenciesFiles = _filter(json.devDependenciesModules, json.devDependenciesFiles,
-                                        json.moduleTargets, "node");
-    json.dependenciesFiles    = _filter(json.dependenciesModules, json.dependenciesFiles,
-                                        json.moduleTargets, "node");
-
-    if ( /node/i.test( json.build.target.join(" ") ) ) { // node ready module
-        var result = [].concat( json.devDependenciesFiles.map(_node),
-                                json.dependenciesFiles.map(_node),
-                                json.build.files.map(_node) );
-
-        result.push('require("../' + json.build.output + '");');
+    if ( /node/i.test( build.target.join(" ") ) ) { // node ready module
+        result.push('require("../' + build.output + '");');
         result.push('require("./test.js");');
 
         fs.writeFileSync("test/index.node.js", result.join("\n"));
@@ -156,30 +117,6 @@ function updateNodeTestFile(options, // @arg Object:
     function _node(file) {
         return 'require("../' + file + '");';
     }
-}
-
-function _filter(dependenciesModules, // @arg WebModuleNameStringArray: ["uupaa.console.js", "uupaa.valid.js", ...]
-                 dependenciesFiles,   // @arg WebModuleFilePathStringArray: ["node_modules/uupaa.console.js/lib/Console.js", "node_modules/uupaa.valid.js/lib/Valid.js", ...]
-                 moduleTargets,       // @arg Object: { "uupaa.console.js": ["Worker"], ... }
-                 targetName) {        // @arg String: "browser", "worker", "node"
-
-    var rex = new RegExp(targetName, "i");
-
-    return dependenciesModules.reduce(function(result, moduleName) { // "uupaa.console.js"
-                if (moduleName in moduleTargets) {
-                    var selector = moduleTargets[moduleName].join(" ");
-
-                    if ( rex.test(selector) ) { // module ready?
-                        for (var i = 0, iz = dependenciesFiles.length; i < iz; ++i) {
-                            if ( dependenciesFiles[i].indexOf(moduleName) >= 0) {
-                                result.push( dependenciesFiles[i] );
-                                return result;
-                            }
-                        }
-                    }
-                }
-                return result;
-            }, []);
 }
 
 function _parseCommandLineOptions(options) { // @arg Object:
@@ -202,5 +139,4 @@ function _multiline(fn) { // @arg Function:
                           // @ret String:
     return (fn + "").split("\n").slice(1, -1).join("\n");
 }
-
 
