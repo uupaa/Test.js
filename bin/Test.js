@@ -85,7 +85,7 @@ function updateBrowserTestFile(options, // @arg Object:
                                      json.moduleTargets,
                                      "worker");
 
-    if ( /worker/i.test( json.build.target.join(" ") ) ) { // worker ready module
+    if ( !/worker/i.test( json.build.target.join(" ") ) ) { // worker ready module
         json.build.files = [];
     }
 
@@ -105,7 +105,7 @@ function updateBrowserTestFile(options, // @arg Object:
     json.dependenciesFiles    = _filter(json.dependenciesModules, json.dependenciesFiles,
                                         json.moduleTargets, "browser");
 
-    if ( /browser/i.test( json.build.target.join(" ") ) ) { // browser ready module
+    if ( !/browser/i.test( json.build.target.join(" ") ) ) { // browser ready module
         json.build.files = [];
     }
 
@@ -140,7 +140,7 @@ function updateNodeTestFile(options, // @arg Object:
     json.dependenciesFiles    = _filter(json.dependenciesModules, json.dependenciesFiles,
                                         json.moduleTargets, "node");
 
-    if ( /node/i.test( json.build.target.join(" ") ) ) { // node ready module
+    if ( !/node/i.test( json.build.target.join(" ") ) ) { // node ready module
         json.build.files = [];
     }
 
