@@ -8,10 +8,18 @@
       "lib/Test.js"
     ],
     "output": "release/Test.min.js",
-    "target": []
+    "target": [
+      "Browser",
+      "Worker",
+      "Node"
+    ]
   },
   "moduleTargets": {
-    "uupaa.test.js": [],
+    "uupaa.test.js": [
+      "Browser",
+      "Worker",
+      "Node"
+    ],
     "uupaa.task.js": [
       "Browser",
       "Worker",

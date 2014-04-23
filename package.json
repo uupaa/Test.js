@@ -1,6 +1,6 @@
 {
   "name":           "uupaa.test.js",
-  "version":        "0.8.23",
+  "version":        "0.8.24",
   "description":    "Test Runner.",
   "url":            "https://github.com/uupaa/Test.js",
   "keywords":       ["test", "util", "uupaa", "WebModule"],
@@ -22,7 +22,7 @@
   "x-build": {
     "files":        ["lib/Test.js"],
     "output":       "release/Test.min.js",
-    "target":       []
+    "target":       ["Browser", "Worker", "Node"]
   },
   "dependencies": {
     "uupaa.task.js":    ""
