@@ -2,14 +2,19 @@
 
 var _USAGE = _multiline(function() {/*
     Usage:
-        node bin/TestPage.js [--help]
-                             [--verbose]
-                             [--nobrowser]
-                             [--nonode]
+        node TestPage.js [--help]
+                         [--verbose]
+                         [--nobrowser]
+                         [--nonode]
 
 */});
 
-var indexHTMLFile = _multiline(function() {/*
+var NODE_TEST_PAGE = _multiline(function() {/*
+__SCRIPT__
+
+*/});
+
+var BROWSER_TEST_PAGE = _multiline(function() {/*
 <!DOCTYPE html><html><head><title>test</title>
 <meta charset="utf-8"></head><body>
 
@@ -26,14 +31,14 @@ onmessage = function(event) {
 __SCRIPT__
 
 </body></html>
+
 */});
 
-var _CONSOLE_COLOR = {
-        RED:    "\u001b[31m",
-        YELLOW: "\u001b[33m",
-        GREEN:  "\u001b[32m",
-        CLEAR:  "\u001b[0m"
-    };
+
+function put(msg) { console.log(msg); }
+put.error = function(msg) { put("\u001b[31m" + msg + "\u001b[0m"); };
+put.warn  = function(msg) { put("\u001b[33m" + msg + "\u001b[0m"); };
+put.info  = function(msg) { put("\u001b[32m" + msg + "\u001b[0m"); };
 
 var fs   = require("fs");
 var argv = process.argv.slice(2);
@@ -48,7 +53,7 @@ var options = _parseCommandLineOptions({
     });
 
 if (options.help) {
-    console.log(_CONSOLE_COLOR.YELLOW + _USAGE + _CONSOLE_COLOR.CLEAR);
+    put.warn( _USAGE );
     return;
 }
 
@@ -57,20 +62,33 @@ var moduleData = NodeModule.collectModuleData({ dir: "", result: null, develop: 
 moduleData = NodeModule.collectModuleData({ dir: "", result: moduleData, develop: false });
 
 if (options.verbose) {
-    console.log(_CONSOLE_COLOR.GREEN + JSON.stringify(moduleData, null, 2) + _CONSOLE_COLOR.CLEAR);
+    put.info( "moduleData: \n    " + JSON.stringify(moduleData, null, 2).replace(/\n/g, "\n    ") + "\n" );
 }
 
 if (options.browser) {
-    createBrowserTestPage(options, moduleData, package);
+    var browserTestPage = _createBrowserTestPage(options, moduleData, package);
+
+    fs.writeFileSync("test/index.html", browserTestPage);
+
+    if (options.verbose) {
+        put.info( "update test/index.html: \n    " + browserTestPage.replace(/\n/g, "\n    " ) );
+    }
 }
 if (options.node) {
-    createNodeTestPage(options, moduleData, package);
+    var nodeTestPage = _createNodeTestPage(options, moduleData, package);
+
+    fs.writeFileSync("test/index.node.js", nodeTestPage);
+
+    if (options.verbose) {
+        put.info( "update test/index.node.js: \n    " + nodeTestPage.replace(/\n/g, "\n    " ) );
+    }
 }
 
 // =========================================================
-function createBrowserTestPage(options,    // @arg Object:
-                               moduleData, // @arg Object:
-                               package) {  // @arg Object: package.json
+function _createBrowserTestPage(options,    // @arg Object:
+                                moduleData, // @arg Object:
+                                package) {  // @arg Object: package.json
+                                            // @ret String:
 
     var build = package["x-build"] || package["build"];
     var importScriptFiles = moduleData.workerFiles.concat(build.files).map(_worker);
@@ -78,9 +96,9 @@ function createBrowserTestPage(options,    // @arg Object:
     if ( /(all|worker)/i.test( build.target.join(" ") ) ) {
         importScriptFiles.push('importScripts(baseDir + "../' + build.output + '");');
         importScriptFiles.push('importScripts(baseDir + "./test.js");');
-        indexHTMLFile = indexHTMLFile.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
+        BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
     } else {
-        indexHTMLFile = indexHTMLFile.replace("__IMPORT_SCRIPTS__", "");
+        BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", "");
     }
 
     var scriptFiles = moduleData.browserFiles.concat(build.files).map(_browser);
@@ -88,12 +106,11 @@ function createBrowserTestPage(options,    // @arg Object:
     if ( /(all|browser)/i.test( build.target.join(" ") ) ) { // browser ready module
         scriptFiles.push('<script src="../' + build.output + '"></script>');
         scriptFiles.push('<script src="./test.js"></script>');
-        indexHTMLFile = indexHTMLFile.replace("__SCRIPT__", scriptFiles.join("\n"));
+        BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__SCRIPT__", scriptFiles.join("\n"));
     } else {
-        indexHTMLFile = indexHTMLFile.replace("__SCRIPT__", "");
+        BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__SCRIPT__", "");
     }
-
-    fs.writeFileSync("test/index.html", indexHTMLFile + "\n");
+    return BROWSER_TEST_PAGE;
 
     function _worker(file) {
         return 'importScripts(baseDir + "../' + file + '");';
@@ -104,21 +121,20 @@ function createBrowserTestPage(options,    // @arg Object:
     }
 }
 
-function createNodeTestPage(options,    // @arg Object:
-                            moduleData, // @arg Object:
-                            package) {  // @arg Object: package.json
+function _createNodeTestPage(options,    // @arg Object:
+                             moduleData, // @arg Object:
+                             package) {  // @arg Object: package.json
+                                         // @ret String:
 
     var build = package["x-build"] || package["build"];
-    var result = moduleData.nodeFiles.concat(build.files).map(_node);
+    var files = moduleData.nodeFiles.concat(build.files).map(_node);
 
     if ( /(all|node)/i.test( build.target.join(" ") ) ) { // node ready module
-        result.push('require("../' + build.output + '");');
-        result.push('require("./test.js");');
-
-        fs.writeFileSync("test/index.node.js", result.join("\n"));
-    } else {
-        fs.writeFileSync("test/index.node.js", "");
+        files.push('require("../' + build.output + '");');
+        files.push('require("./test.js");');
+        return NODE_TEST_PAGE.replace("__SCRIPT__", files.join("\n"));
     }
+    return "";
 
     function _node(file) {
         return 'require("../' + file + '");';

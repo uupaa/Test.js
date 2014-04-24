@@ -1,6 +1,6 @@
 {
   "name":           "uupaa.test.js",
-  "version":        "0.10.6",
+  "version":        "0.10.7",
   "description":    "Test Runner.",
   "url":            "https://github.com/uupaa/Test.js",
   "keywords":       ["test", "util", "uupaa", "WebModule"],
@@ -14,7 +14,7 @@
     "build-simple": "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty --nowrap --simple",
     "build-release":"node node_modules/uupaa.minify.js --verbose --strict --module",
     "test":         "npm run test-node; npm run test-browser",
-    "test-page":    "node bin/TestPage.js",
+    "test-page":    "node bin/TestPage.js --verbose",
     "test-node":    "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
     "test-browser": "open test/index.html",
     "lint":         "node node_modules/uupaa.plato.js; open lint/plato/index.html"
