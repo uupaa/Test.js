@@ -56,6 +56,10 @@ var moduleData = NodeModule.collectModuleData({ dir: "", result: null, develop: 
 
 moduleData = NodeModule.collectModuleData({ dir: "", result: moduleData, develop: false });
 
+if (options.verbose) {
+    console.log(_CONSOLE_COLOR.GREEN + JSON.stringify(moduleData, null, 2) + _CONSOLE_COLOR.CLEAR);
+}
+
 if (options.browser) {
     createBrowserTestPage(options, moduleData, package);
 }
@@ -71,7 +75,7 @@ function createBrowserTestPage(options,    // @arg Object:
     var build = package["x-build"] || package["build"];
     var importScriptFiles = moduleData.workerFiles.concat(build.files).map(_worker);
 
-    if ( /worker/i.test( build.target.join(" ") ) ) {
+    if ( /(all|worker)/i.test( build.target.join(" ") ) ) {
         importScriptFiles.push('importScripts(baseDir + "../' + build.output + '");');
         importScriptFiles.push('importScripts(baseDir + "./test.js");');
         indexHTMLFile = indexHTMLFile.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
@@ -81,7 +85,7 @@ function createBrowserTestPage(options,    // @arg Object:
 
     var scriptFiles = moduleData.browserFiles.concat(build.files).map(_browser);
 
-    if ( /browser/i.test( build.target.join(" ") ) ) { // browser ready module
+    if ( /(all|browser)/i.test( build.target.join(" ") ) ) { // browser ready module
         scriptFiles.push('<script src="../' + build.output + '"></script>');
         scriptFiles.push('<script src="./test.js"></script>');
         indexHTMLFile = indexHTMLFile.replace("__SCRIPT__", scriptFiles.join("\n"));
@@ -107,7 +111,7 @@ function createNodeTestPage(options,    // @arg Object:
     var build = package["x-build"] || package["build"];
     var result = moduleData.nodeFiles.concat(build.files).map(_node);
 
-    if ( /node/i.test( build.target.join(" ") ) ) { // node ready module
+    if ( /(all|node)/i.test( build.target.join(" ") ) ) { // node ready module
         result.push('require("../' + build.output + '");');
         result.push('require("./test.js");');
 
