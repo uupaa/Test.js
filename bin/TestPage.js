@@ -2,10 +2,10 @@
 
 var _USAGE = _multiline(function() {/*
     Usage:
-        node bin/Test.js [--help]
-                         [--verbose]
-                         [--browser]
-                         [--node]
+        node bin/TestPage.js [--help]
+                             [--verbose]
+                             [--nobrowser]
+                             [--nonode]
 
 */});
 
@@ -43,8 +43,8 @@ var package = JSON.parse(fs.readFileSync("package.json", "UTF-8"));
 var options = _parseCommandLineOptions({
         help:       false,      // Boolean: true is show help.
         verbose:    false,      // Boolean: true is verbose mode.
-        browser:    false,      // Boolean: true is update test/index.html file.
-        node:       false,      // Boolean: true is update test/index.node.js file.
+        browser:    true,       // Boolean: true is update test/index.html file.
+        node:       true,       // Boolean: true is update test/index.node.js file.
     });
 
 if (options.help) {
@@ -52,19 +52,19 @@ if (options.help) {
     return;
 }
 
-var moduleData = NodeModule.load({ dir: "", result: null, develop: true });
+var moduleData = NodeModule.collectModuleData({ dir: "", result: null, develop: true });
 
-moduleData = NodeModule.load({ dir: "", result: moduleData, develop: false });
+moduleData = NodeModule.collectModuleData({ dir: "", result: moduleData, develop: false });
 
 if (options.browser) {
-    updateBrowserTestPage(options, moduleData, package);
+    createBrowserTestPage(options, moduleData, package);
 }
 if (options.node) {
-    updateNodeTestPage(options, moduleData, package);
+    createNodeTestPage(options, moduleData, package);
 }
 
 // =========================================================
-function updateBrowserTestPage(options,    // @arg Object:
+function createBrowserTestPage(options,    // @arg Object:
                                moduleData, // @arg Object:
                                package) {  // @arg Object: package.json
 
@@ -100,7 +100,7 @@ function updateBrowserTestPage(options,    // @arg Object:
     }
 }
 
-function updateNodeTestPage(options,    // @arg Object:
+function createNodeTestPage(options,    // @arg Object:
                             moduleData, // @arg Object:
                             package) {  // @arg Object: package.json
 
@@ -129,8 +129,8 @@ function _parseCommandLineOptions(options) { // @arg Object:
         case "--help":      options.help    = true; break;
         case "-v":
         case "--verbose":   options.verbose = true; break;
-        case "--browser":   options.browser = true; break;
-        case "--node":      options.node    = true; break;
+        case "--nobrowser": options.browser = false; break;
+        case "--nonode":    options.node    = false; break;
         default:
         }
     }
