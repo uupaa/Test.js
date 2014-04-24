@@ -1,6 +1,6 @@
 {
   "name":           "uupaa.test.js",
-  "version":        "0.10.4",
+  "version":        "0.10.5",
   "description":    "Test Runner.",
   "url":            "https://github.com/uupaa/Test.js",
   "keywords":       ["test", "util", "uupaa", "WebModule"],
@@ -25,10 +25,10 @@
     "target":       ["all"]
   },
   "dependencies": {
-    "uupaa.nodemodule.js": "",
-    "uupaa.task.js":    ""
+    "uupaa.task.js": ""
   },
   "devDependencies": {
+    "uupaa.nodemodule.js": "",
     "uupaa.console.js": "",
     "uupaa.valid.js":   "",
     "uupaa.help.js":    "",
