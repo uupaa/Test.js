@@ -57,9 +57,7 @@ if (options.help) {
     return;
 }
 
-var moduleData = NodeModule.collectModuleData({ dir: "", result: null, develop: true });
-
-moduleData = NodeModule.collectModuleData({ dir: "", result: moduleData, develop: false });
+var moduleData = NodeModule.collectModuleData({ dir: "", develop: true });
 
 if (options.verbose) {
     put.info( "moduleData: \n    " + JSON.stringify(moduleData, null, 2).replace(/\n/g, "\n    ") + "\n" );
