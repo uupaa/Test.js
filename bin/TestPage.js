@@ -57,14 +57,14 @@ if (options.help) {
     return;
 }
 
-var moduleData = NodeModule.collectModuleData({ dir: "", develop: true });
+var files = NodeModule.files({ dir: "", develop: true });
 
 if (options.verbose) {
-    put.info( "moduleData: \n    " + JSON.stringify(moduleData, null, 2).replace(/\n/g, "\n    ") + "\n" );
+    put.info( "files: \n    " + JSON.stringify(files, null, 2).replace(/\n/g, "\n    ") + "\n" );
 }
 
 if (options.browser) {
-    var browserTestPage = _createBrowserTestPage(options, moduleData, package);
+    var browserTestPage = _createBrowserTestPage(options, files, package);
 
     fs.writeFileSync("test/index.html", browserTestPage);
 
@@ -73,7 +73,7 @@ if (options.browser) {
     }
 }
 if (options.node) {
-    var nodeTestPage = _createNodeTestPage(options, moduleData, package);
+    var nodeTestPage = _createNodeTestPage(options, files, package);
 
     fs.writeFileSync("test/index.node.js", nodeTestPage);
 
@@ -83,13 +83,14 @@ if (options.node) {
 }
 
 // =========================================================
-function _createBrowserTestPage(options,    // @arg Object:
-                                moduleData, // @arg Object:
-                                package) {  // @arg Object: package.json
-                                            // @ret String:
+function _createBrowserTestPage(options,   // @arg Object:
+                                files,     // @arg Object:
+                                package) { // @arg Object: package.json
+                                           // @ret String:
 
     var build = package["x-build"] || package["build"];
-    var importScriptFiles = moduleData.workerFiles.concat(build.files).map(_worker);
+  //var importScriptFiles = files.worker.concat(build.files).map(_worker);
+    var importScriptFiles = files.worker.map(_worker);
 
     if ( /(all|worker)/i.test( build.target.join(" ") ) ) {
         importScriptFiles.push('importScripts(baseDir + "../' + build.output + '");');
@@ -99,7 +100,8 @@ function _createBrowserTestPage(options,    // @arg Object:
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", "");
     }
 
-    var scriptFiles = moduleData.browserFiles.concat(build.files).map(_browser);
+  //var scriptFiles = files.browser.concat(build.files).map(_browser);
+    var scriptFiles = files.browser.map(_browser);
 
     if ( /(all|browser)/i.test( build.target.join(" ") ) ) { // browser ready module
         scriptFiles.push('<script src="../' + build.output + '"></script>');
@@ -119,18 +121,19 @@ function _createBrowserTestPage(options,    // @arg Object:
     }
 }
 
-function _createNodeTestPage(options,    // @arg Object:
-                             moduleData, // @arg Object:
-                             package) {  // @arg Object: package.json
-                                         // @ret String:
+function _createNodeTestPage(options,   // @arg Object:
+                             files,     // @arg Object:
+                             package) { // @arg Object: package.json
+                                        // @ret String:
 
     var build = package["x-build"] || package["build"];
-    var files = moduleData.nodeFiles.concat(build.files).map(_node);
+  //var requireFiles = files.node.concat(build.files).map(_node);
+    var requireFiles = files.node.map(_node);
 
     if ( /(all|node)/i.test( build.target.join(" ") ) ) { // node ready module
-        files.push('require("../' + build.output + '");');
-        files.push('require("./test.js");');
-        return NODE_TEST_PAGE.replace("__SCRIPT__", files.join("\n"));
+        requireFiles.push('require("../' + build.output + '");');
+        requireFiles.push('require("./test.js");');
+        return NODE_TEST_PAGE.replace("__SCRIPT__", requireFiles.join("\n"));
     }
     return "";
 
