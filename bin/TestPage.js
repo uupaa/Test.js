@@ -89,8 +89,7 @@ function _createBrowserTestPage(options,   // @arg Object:
                                            // @ret String:
 
     var build = package["x-build"] || package["build"];
-  //var importScriptFiles = files.worker.concat(build.files).map(_worker);
-    var importScriptFiles = files.worker.map(_worker);
+    var importScriptFiles = NodeModule.uniqueArray(files.worker.concat(build.files).map(_worker)).unique;
 
     if ( /(all|worker)/i.test( build.target.join(" ") ) ) {
         importScriptFiles.push('importScripts(baseDir + "../' + build.output + '");');
@@ -100,8 +99,7 @@ function _createBrowserTestPage(options,   // @arg Object:
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", "");
     }
 
-  //var scriptFiles = files.browser.concat(build.files).map(_browser);
-    var scriptFiles = files.browser.map(_browser);
+    var scriptFiles = NodeModule.uniqueArray(files.browser.concat(build.files).map(_browser)).unique;
 
     if ( /(all|browser)/i.test( build.target.join(" ") ) ) { // browser ready module
         scriptFiles.push('<script src="../' + build.output + '"></script>');
@@ -127,8 +125,7 @@ function _createNodeTestPage(options,   // @arg Object:
                                         // @ret String:
 
     var build = package["x-build"] || package["build"];
-  //var requireFiles = files.node.concat(build.files).map(_node);
-    var requireFiles = files.node.map(_node);
+    var requireFiles = NodeModule.uniqueArray(files.node.concat(build.files).map(_node)).unique;
 
     if ( /(all|node)/i.test( build.target.join(" ") ) ) { // node ready module
         requireFiles.push('require("../' + build.output + '");');
