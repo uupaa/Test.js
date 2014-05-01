@@ -1,19 +1,22 @@
-new Test().add([
-        testOK,
-//      testNG,
-    ]).run(function(err, test) {
-        if (1) {
-            err || test.worker(function(err, test) {
-                if (!err && typeof Test_ !== "undefined") {
-//                  var name = Test.swap(Test, Test_);
+var ModuleTest = (function(global) {
 
-                    new Test(test).run().worker(function(err, test) {
-//                      Test.undo(name);
-                    });
-                }
-            });
-        }
-    });
+var testParam = {
+        disable:    false,
+        node:       true,
+        browser:    true,
+        worker:     true,
+        button:     true,
+        both:       false,
+        primary:    global["Test"],
+        secondary:  global["Test_"],
+    };
+
+var items = [
+        testOK,
+      //testNG,
+    ];
+
+new Test(testParam).add(items).run();
 
 function testOK(next) {
 
@@ -37,4 +40,6 @@ function testNG(next) {
     }
 }
 
+return items;
+})((this || 0).self || global);
 
