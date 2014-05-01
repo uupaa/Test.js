@@ -20,7 +20,7 @@ var BROWSER_TEST_PAGE = _multiline(function() {/*
 
 <script id="worker" type="javascript/worker">
 onmessage = function(event) {
-    var baseDir = event.data.baseDir;
+    var BASE_DIR = event.data.BASE_DIR;
 
     __IMPORT_SCRIPTS__
 
@@ -92,8 +92,8 @@ function _createBrowserTestPage(options,   // @arg Object:
     var importScriptFiles = NodeModule.uniqueArray(files.worker.concat(build.files).map(_worker)).unique;
 
     if ( /(all|worker)/i.test( build.target.join(" ") ) ) {
-        importScriptFiles.push('importScripts(baseDir + "../' + build.output + '");');
-        importScriptFiles.push('importScripts(baseDir + "./test.js");');
+        importScriptFiles.push('importScripts(BASE_DIR + "../' + build.output + '");');
+        importScriptFiles.push('importScripts(BASE_DIR + "./test.js");');
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
     } else {
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", "");
@@ -111,7 +111,7 @@ function _createBrowserTestPage(options,   // @arg Object:
     return BROWSER_TEST_PAGE;
 
     function _worker(file) {
-        return 'importScripts(baseDir + "../' + file + '");';
+        return 'importScripts(BASE_DIR + "../' + file + '");';
     }
 
     function _browser(file) {
