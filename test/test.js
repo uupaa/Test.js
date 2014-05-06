@@ -1,30 +1,26 @@
-var ModuleTest = (function(global) {
+var ModuleTestTest = (function(global) {
 
-var testParam = {
+var _inNode    = "process"        in global;
+var _inWorker  = "WorkerLocation" in global;
+var _inBrowser = "document"       in global;
+
+return new Test("Test", {
         disable:    false,
-        node:       true,
         browser:    true,
         worker:     true,
+        node:       true,
         button:     true,
-        both:       false,
-        primary:    global["Test"],
-        secondary:  global["Test_"],
-    };
-
-var items = [
+        both:       true,
+    }).add([
         testOK,
       //testNG,
-    ];
-
-new Test(testParam).add(items).run();
+    ]).run().clone();
 
 function testOK(next) {
 
     if (1) {
-        console.log("testOK ok");
         next && next.pass();
     } else {
-        console.log("testOK ng");
         next && next.miss();
     }
 }
@@ -32,14 +28,11 @@ function testOK(next) {
 function testNG(next) {
 
     if (0) {
-        console.log("testNG ok");
         next && next.pass();
     } else {
-        console.log("testNG ng");
         next && next.miss();
     }
 }
 
-return items;
 })((this || 0).self || global);
 

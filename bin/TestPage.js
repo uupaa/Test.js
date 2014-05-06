@@ -16,11 +16,12 @@ __SCRIPT__
 
 var BROWSER_TEST_PAGE = _multiline(function() {/*
 <!DOCTYPE html><html><head><title>test</title>
+<meta name="viewport" content="width=device-width, user-scalable=no">
 <meta charset="utf-8"></head><body>
 
 <script id="worker" type="javascript/worker">
 onmessage = function(event) {
-    var BASE_DIR = event.data.BASE_DIR;
+    self.MESSAGE = event.data;
 
     __IMPORT_SCRIPTS__
 
@@ -92,8 +93,8 @@ function _createBrowserTestPage(options,   // @arg Object:
     var importScriptFiles = NodeModule.uniqueArray(files.worker.concat(build.files).map(_worker)).unique;
 
     if ( /(all|worker)/i.test( build.target.join(" ") ) ) {
-        importScriptFiles.push('importScripts(BASE_DIR + "../' + build.output + '");');
-        importScriptFiles.push('importScripts(BASE_DIR + "./test.js");');
+        importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "../' + build.output + '");');
+        importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "./test.js");');
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
     } else {
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", "");
@@ -111,7 +112,7 @@ function _createBrowserTestPage(options,   // @arg Object:
     return BROWSER_TEST_PAGE;
 
     function _worker(file) {
-        return 'importScripts(BASE_DIR + "../' + file + '");';
+        return 'importScripts(MESSAGE.BASE_DIR + "../' + file + '");';
     }
 
     function _browser(file) {
