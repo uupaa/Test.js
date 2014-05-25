@@ -1,6 +1,6 @@
 {
   "name":           "uupaa.test.js",
-  "version":        "0.14.3",
+  "version":        "0.14.4",
   "description":    "Test Runner.",
   "url":            "https://github.com/uupaa/Test.js",
   "keywords":       ["test", "util", "uupaa", "WebModule"],
