@@ -12,26 +12,21 @@ return new Test("Test", {
         button:     true,
         both:       true,
     }).add([
-        testOK,
-      //testNG,
+        pass,
+//        miss,
+//        error,
     ]).run().clone();
 
-function testOK(next) {
-
-    if (1) {
-        next && next.pass();
-    } else {
-        next && next.miss();
-    }
+function pass(next) {
+    next && next.pass();
 }
 
-function testNG(next) {
+function miss(next) {
+    next && next.miss();
+}
 
-    if (0) {
-        next && next.pass();
-    } else {
-        next && next.miss();
-    }
+function error(next) {
+    throw new Error();
 }
 
 })((this || 0).self || global);
