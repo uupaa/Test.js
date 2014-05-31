@@ -12,20 +12,32 @@ return new Test("Test", {
         button:     true,
         both:       true,
     }).add([
-        pass,
-//        miss,
-//        error,
+ //ok       testPass0Arg,
+        testPass1Arg,
+        testPass3Arg,
+ //ok       testMiss,
+ //ok       testError,
     ]).run().clone();
 
-function pass(next) {
-    next && next.pass();
+function testPass0Arg() {
 }
 
-function miss(next) {
-    next && next.miss();
+function testPass1Arg(next) {
+    next.pass(1, 2);
 }
 
-function error(next) {
+function testPass3Arg(next, pass, miss) {
+    next.done(pass(1, 2));
+}
+
+function testMiss(task, pass, miss) {
+    //miss();
+    //next.miss();
+    task.done(miss(1, 2));
+}
+
+function testError(task, pass, miss) {
+    miss();
     throw new Error();
 }
 
