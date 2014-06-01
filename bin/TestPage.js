@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var _USAGE = _multiline(function() {/*
+var USAGE = _multiline(function() {/*
     Usage:
         node TestPage.js [--help]
                          [--verbose]
@@ -47,18 +47,18 @@ var NodeModule = require("uupaa.nodemodule.js");
 var package = JSON.parse(fs.readFileSync("package.json", "UTF-8"));
 
 var options = _parseCommandLineOptions({
-        help:       false,      // Boolean: true is show help.
-        verbose:    false,      // Boolean: true is verbose mode.
-        browser:    true,       // Boolean: true is update test/index.html file.
-        node:       true,       // Boolean: true is update test/index.node.js file.
+        help:       false,      // Boolean - true is show help.
+        verbose:    false,      // Boolean - true is verbose mode.
+        browser:    true,       // Boolean - true is update test/index.html file.
+        node:       true,       // Boolean - true is update test/index.node.js file.
     });
 
 if (options.help) {
-    put.warn( _USAGE );
+    put.warn( USAGE );
     return;
 }
 
-var files = NodeModule.files({ dir: "", develop: true });
+var files = NodeModule.files({ dir: "", develop: true }); // { all, node, worker, browser, label }
 
 if (options.verbose) {
     put.info( "files: \n    " + JSON.stringify(files, null, 2).replace(/\n/g, "\n    ") + "\n" );
@@ -84,13 +84,15 @@ if (options.node) {
 }
 
 // =========================================================
-function _createBrowserTestPage(options,   // @arg Object:
-                                files,     // @arg Object:
-                                package) { // @arg Object: package.json
-                                           // @ret String:
+function _createBrowserTestPage(options,   // @arg Object -
+                                files,     // @arg Object - { all, node, worker, browser, label }
+                                package) { // @arg Object - package.json
+                                           // @ret String
 
     var build = package["x-build"] || package["build"];
-    var importScriptFiles = NodeModule.uniqueArray(files.worker.concat(build.files).map(_worker)).unique;
+    var source = build["source"] ||
+                 build["files"]; // [DEPRECATED]
+    var importScriptFiles = NodeModule.uniqueArray(files.worker.concat(source).map(_worker)).unique;
 
     if ( /(all|worker)/i.test( build.target.join(" ") ) ) {
         importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "../' + build.output + '");');
@@ -100,7 +102,7 @@ function _createBrowserTestPage(options,   // @arg Object:
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", "");
     }
 
-    var scriptFiles = NodeModule.uniqueArray(files.browser.concat(build.files).map(_browser)).unique;
+    var scriptFiles = NodeModule.uniqueArray(files.browser.concat(source).map(_browser)).unique;
 
     if ( /(all|browser)/i.test( build.target.join(" ") ) ) { // browser ready module
         scriptFiles.push('<script src="../' + build.output + '"></script>');
@@ -120,13 +122,15 @@ function _createBrowserTestPage(options,   // @arg Object:
     }
 }
 
-function _createNodeTestPage(options,   // @arg Object:
-                             files,     // @arg Object:
-                             package) { // @arg Object: package.json
-                                        // @ret String:
+function _createNodeTestPage(options,   // @arg Object
+                             files,     // @arg Object - { all, node, worker, browser, label }
+                             package) { // @arg Object - package.json
+                                        // @ret String
 
     var build = package["x-build"] || package["build"];
-    var requireFiles = NodeModule.uniqueArray(files.node.concat(build.files).map(_node)).unique;
+    var source = build["source"] ||
+                 build["files"]; // [DEPRECATED]
+    var requireFiles = NodeModule.uniqueArray(files.node.concat(source).map(_node)).unique;
 
     if ( /(all|node)/i.test( build.target.join(" ") ) ) { // node ready module
         requireFiles.push('require("../' + build.output + '");');
