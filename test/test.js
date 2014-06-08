@@ -22,17 +22,17 @@ return new Test("Test", {
 function testPass0Arg() {
 }
 
-function testPass1Arg(next) {
-    next.pass(1, 2);
+function testPass1Arg(test) {
+    test.pass(1, 2);
 }
 
-function testPass3Arg(next, pass, miss) {
-    next.done(pass(1, 2));
+function testPass3Arg(test, pass, miss) {
+    test.done(pass(1, 2));
 }
 
 function testMiss(task, pass, miss) {
     //miss();
-    //next.miss();
+    //test.miss();
     task.done(miss(1, 2));
 }
 
