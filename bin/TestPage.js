@@ -96,7 +96,7 @@ function _createBrowserTestPage(options,   // @arg Object -
 
     if ( /(all|worker)/i.test( build.target.join(" ") ) ) {
         importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "../' + build.output + '");');
-        importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "./test.js");');
+        importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "./test.js?_=' + Date.now() + '");');
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
     } else {
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", "");
@@ -106,7 +106,7 @@ function _createBrowserTestPage(options,   // @arg Object -
 
     if ( /(all|browser)/i.test( build.target.join(" ") ) ) { // browser ready module
         scriptFiles.push('<script src="../' + build.output + '"></script>');
-        scriptFiles.push('<script src="./test.js"></script>');
+        scriptFiles.push('<script src="./test.js?=_' + Date.now() + '"></script>');
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__SCRIPT__", scriptFiles.join("\n"));
     } else {
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__SCRIPT__", "");
