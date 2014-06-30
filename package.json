@@ -1,6 +1,6 @@
 {
   "name":           "uupaa.test.js",
-  "version":        "0.14.11",
+  "version":        "0.14.12",
   "description":    "Test Runner.",
   "url":            "https://github.com/uupaa/Test.js",
   "keywords":       ["test", "util", "uupaa", "WebModule", "Unstable"],
@@ -21,10 +21,10 @@
     "lint":         "node node_modules/uupaa.plato.js; open lint/plato/index.html"
   },
   "x-build": {
-    "files":        ["lib/Test.js"],
+    "source":       ["lib/Test.js"],
     "output":       "release/Test.min.js",
     "target":       ["all"],
-    "labels":       ["@dev"],
+    "label":        ["@dev"],
     "module": {
       "develop":    ["uupaa.valid.js"],
       "release":    ["uupaa.task.js"]
