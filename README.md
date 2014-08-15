@@ -1,24 +1,25 @@
-=========
-Test.js
-=========
+# Test.js [![Build Status](https://travis-ci.org/uupaa/Test.js.png)](http://travis-ci.org/uupaa/Test.js)
 
-![](https://travis-ci.org/uupaa/Test.js.png)
+[![npm](https://nodei.co/npm/uupaa.test.js.png?downloads=true&stars=true)](https://nodei.co/npm/uupaa.test.js/)
 
 Test Runner.
 
-# Document
+## Document
 
 - [Test.js wiki](https://github.com/uupaa/Test.js/wiki/Test)
 - [Development](https://github.com/uupaa/WebModule/wiki/Development)
-- [WebModule](https://github.com/uupaa/WebModule) ([Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html))
+- [WebModule](https://github.com/uupaa/WebModule)
+    - [Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html)
+    - [Development](https://github.com/uupaa/WebModule/wiki/Development)
 
 
-# How to use
+## How to use
+
+### Browser
 
 ```js
 <script src="lib/Test.js">
 <script>
-// for Browser
 
     new Test().add([
         testCase1,
@@ -40,15 +41,17 @@ Test Runner.
 </script>
 ```
 
+### WebWorkers
+
 ```js
-// for WebWorkers
 importScripts("lib/Test.js");
 
     ...
 ```
 
+### Node.js
+
 ```js
-// for Node.js
 var Test = require("lib/Test.js");
 
     ...
