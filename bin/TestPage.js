@@ -6,6 +6,7 @@ var USAGE = _multiline(function() {/*
                          [--verbose]
                          [--nobrowser]
                          [--nonode]
+                         [--addtime]
 
 */});
 
@@ -47,10 +48,11 @@ var NodeModule = require("uupaa.nodemodule.js");
 var package = JSON.parse(fs.readFileSync("package.json", "UTF-8"));
 
 var options = _parseCommandLineOptions({
-        help:       false,      // Boolean - true is show help.
-        verbose:    false,      // Boolean - true is verbose mode.
-        browser:    true,       // Boolean - true is update test/index.html file.
-        node:       true,       // Boolean - true is update test/index.node.js file.
+        help:       false,      // Boolean - show help.
+        verbose:    false,      // Boolean - verbose mode.
+        browser:    true,       // Boolean - update test/index.html file.
+        node:       true,       // Boolean - update test/index.node.js file.
+        addtime:    false,      // Boolean - add "?time=now" for URLString
     });
 
 if (options.help) {
@@ -96,7 +98,11 @@ function _createBrowserTestPage(options,   // @arg Object -
 
     if ( /(all|worker)/i.test( build.target.join(" ") ) ) {
         importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "../' + build.output + '");');
-        importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "./test.js?_=' + Date.now() + '");');
+        if (options.addtime) {
+            importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "./test.js?_=' + Date.now() + '");');
+        } else {
+            importScriptFiles.push('importScripts(MESSAGE.BASE_DIR + "./test.js");');
+        }
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", importScriptFiles.join("\n    "));
     } else {
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__IMPORT_SCRIPTS__", "");
@@ -106,7 +112,11 @@ function _createBrowserTestPage(options,   // @arg Object -
 
     if ( /(all|browser)/i.test( build.target.join(" ") ) ) { // browser ready module
         scriptFiles.push('<script src="../' + build.output + '"></script>');
-        scriptFiles.push('<script src="./test.js?=_' + Date.now() + '"></script>');
+        if (options.addtime) {
+            scriptFiles.push('<script src="./test.js?=_' + Date.now() + '"></script>');
+        } else {
+            scriptFiles.push('<script src="./test.js"></script>');
+        }
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__SCRIPT__", scriptFiles.join("\n"));
     } else {
         BROWSER_TEST_PAGE = BROWSER_TEST_PAGE.replace("__SCRIPT__", "");
@@ -154,6 +164,7 @@ function _parseCommandLineOptions(options) { // @arg Object:
         case "--verbose":   options.verbose = true; break;
         case "--nobrowser": options.browser = false; break;
         case "--nonode":    options.node    = false; break;
+        case "--addtime":   options.addtime = false; break;
         default:
         }
     }
